@@ -349,4 +349,12 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-.data/
+# ignore the vast amount of data
+/data/
+/data/*
+
+# ignore all log files called oberon
+oberon.log*
+
+#ignore vscode folder
+/.vscode/
