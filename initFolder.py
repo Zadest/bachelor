@@ -10,6 +10,7 @@ import numpy as np
 import cv2 as cv
 from PIL import Image
 from io import BytesIO
+from time import sleep
 
 images = []
 
@@ -87,3 +88,27 @@ if __name__ == '__main__':
             getImagesFromScryfall()
         if 'false-load' in sys.argv:
             getImagesNotMTG()
+        if 'test' in sys.argv:
+            image = cv.imread('/home/moritz/dev/bachelor/data/1/130.jpg',0)
+            edges = cv.Canny(image,100,200)
+            cv.imshow('test',edges)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
+        if 'lol':
+            cap = cv.VideoCapture(0)
+            while(True):
+                # Capture frame-by-frame
+                ret, frame = cap.read()
+
+                # Our operations on the frame come here
+                gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+                edges = cv.Canny(gray,30,150)
+                # Display the resulting frame
+                cv.imshow('gray',gray)
+                cv.imshow('edges',edges)
+                if cv.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+            # When everything done, release the capture
+            cap.release()
+            cv.destroyAllWindows()
