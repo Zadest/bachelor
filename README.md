@@ -1,13 +1,15 @@
 # bachelor
 github repo for my bachelor's project
 
-### 0. Setting up conda environment
+### 0. Setting up the development environment
+##### 0.1 Conda
 
 In order to use a virtual environment for the development in Visual Studio, I needed to create one, with the anaconda environment as base.
 
 ```bash
 conda create --name vsBachelor-dev python=3.7 anaconda
 ```
+
 
 
 ### 1. Dataset
