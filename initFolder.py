@@ -3,17 +3,17 @@
 
 __version__ = "0.1"
 
-import os, sys, json, csv
+import os, sys, json, csv, glob
 import requests
 import logging
+import numpy as np
+import cv2 as cv
 from PIL import Image
 from io import BytesIO
 
 images = []
 
-def init():
-    logging.basicConfig(filename='./oberon.log',level=logging.DEBUG,format='[%(asctime)s][%(levelname)s]: %(message)s')
-    logging.info(f'started : Oberon v{__version__}')
+def setupFolders():
     done = True
     try:
         os.makedirs('./data/1/keys/')
@@ -27,6 +27,14 @@ def init():
         done = False
     finally:
         return done
+
+def init():
+    logging.basicConfig(filename='./oberon.log',level=logging.DEBUG,format='[%(asctime)s][%(levelname)s]: %(message)s')
+    logging.info(f'started : Oberon v{__version__}')
+    print(f'started : Oberon v{__version__}')
+    if not os.path.exists('./data/1/keys/') or not os.path.exists('./data/2/keys/'):
+        setupFolders()
+    
 
 def getImagesFromScryfall():
     try:
@@ -54,5 +62,28 @@ def getImagesFromScryfall():
         index += 1
     return True
 
-init()
-getImagesFromScryfall()
+def getImagesNotMTG():
+    try:
+        img = Image.open('./data/2/RAW.jpg')
+    except Exception as e:
+        print(e)
+        return False
+    width, height = img.size
+    filepath = './data/2/'
+    filetype = '.jpg'
+    index = 0
+    for i in range(0,width-672,int(672/3)):
+        for j in range(0,height-936,int(936/3)):
+            temp = img.crop((i,j,i+672,j+936))
+            temp.save(filepath+str(index)+filetype)
+            del temp
+            index += 1
+    return True
+
+if __name__ == '__main__':
+    init()
+    if len(sys.argv) > 1:
+        if 'mtg-load' in sys.argv:
+            getImagesFromScryfall()
+        if 'false-load' in sys.argv:
+            getImagesNotMTG()
