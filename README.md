@@ -8,6 +8,8 @@ In order to use a virtual environment for the development in Visual Studio, I ne
 
 ```bash
 conda create --name vsBachelor-dev python=3.7 anaconda
+conda install -c conda-forge opencv
+conda install -c anaconda keras
 ```
 
 
