@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf8 -*-
 
-__version__ = "0.1"
+__version__ = "0.2"
 
 import os, sys, json, csv, glob
 import requests
@@ -11,6 +11,8 @@ import cv2 as cv
 from PIL import Image
 from io import BytesIO
 from time import sleep
+import tensorflow as tf
+import keras
 
 images = []
 
@@ -102,10 +104,16 @@ if __name__ == '__main__':
 
                 # Our operations on the frame come here
                 gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-                edges = cv.Canny(gray,30,150)
+                
+                kernel = np.ones((5,5),np.float32)/25
+                blur = cv.filter2D(gray,-1,kernel)
+
+                edges = cv.Canny(blur,15,30)
+
                 # Display the resulting frame
                 cv.imshow('gray',gray)
                 cv.imshow('edges',edges)
+                cv.imshow('blur',blur)
                 if cv.waitKey(1) & 0xFF == ord('q'):
                     break
 
