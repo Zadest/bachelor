@@ -1,19 +1,22 @@
 #! /usr/bin/env python3
 # -*- coding: utf8 -*-
 
-__version__ = "0.1"
+__version__ = "0.2"
 
-import os, sys, json, csv
+import os, sys, json, csv, glob
 import requests
 import logging
+import numpy as np
+import cv2 as cv
 from PIL import Image
 from io import BytesIO
+from time import sleep
+import tensorflow as tf
+import keras
 
 images = []
 
-def init():
-    logging.basicConfig(filename='./oberon.log',level=logging.DEBUG,format='[%(asctime)s][%(levelname)s]: %(message)s')
-    logging.info(f'started : Oberon v{__version__}')
+def setupFolders():
     done = True
     try:
         os.makedirs('./data/1/keys/')
@@ -28,6 +31,13 @@ def init():
     finally:
         return done
 
+def init():
+    logging.basicConfig(filename='./oberon.log',level=logging.DEBUG,format='[%(asctime)s][%(levelname)s]: %(message)s')
+    logging.info(f'started : Oberon v{__version__}')
+    print(f'started : Oberon v{__version__}')
+    if not os.path.exists('./data/1/keys/') or not os.path.exists('./data/2/keys/'):
+        setupFolders()
+    
 def getImagesFromScryfall():
     try:
         response = requests.get('https://api.scryfall.com/cards/')
@@ -54,5 +64,58 @@ def getImagesFromScryfall():
         index += 1
     return True
 
-init()
-getImagesFromScryfall()
+def getImagesNotMTG():
+    try:
+        img = Image.open('./data/2/RAW.jpg')
+    except Exception as e:
+        print(e)
+        return False
+    width, height = img.size
+    filepath = './data/2/'
+    filetype = '.jpg'
+    index = 0
+    for i in range(0,width-672,int(672/3)):
+        for j in range(0,height-936,int(936/3)):
+            temp = img.crop((i,j,i+672,j+936))
+            temp.save(filepath+str(index)+filetype)
+            del temp
+            index += 1
+    return True
+
+if __name__ == '__main__':
+    init()
+    if len(sys.argv) > 1:
+        if 'mtg-load' in sys.argv:
+            getImagesFromScryfall()
+        if 'false-load' in sys.argv:
+            getImagesNotMTG()
+        if 'test' in sys.argv:
+            image = cv.imread('/home/moritz/dev/bachelor/data/1/130.jpg',0)
+            edges = cv.Canny(image,100,200)
+            cv.imshow('test',edges)
+            cv.waitKey(0)
+            cv.destroyAllWindows()
+        if 'lol':
+            cap = cv.VideoCapture(0)
+            while(True):
+                # Capture frame-by-frame
+                ret, frame = cap.read()
+
+                # Our operations on the frame come here
+                gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+                
+                kernel = np.ones((5,5),np.float32)/25
+                blur = cv.filter2D(gray,-1,kernel)
+
+                edges = cv.Canny(blur,15,30)
+
+                # Display the resulting frame
+                cv.imshow('gray',gray)
+                cv.imshow('edges',edges)
+                cv.imshow('blur',blur)
+                if cv.waitKey(1) & 0xFF == ord('q'):
+                    break
+
+            # When everything done, release the capture
+            cap.release()
+            cv.destroyAllWindows()
