@@ -38,7 +38,6 @@ def init():
     if not os.path.exists('./data/1/keys/') or not os.path.exists('./data/2/keys/'):
         setupFolders()
     
-
 def getImagesFromScryfall():
     try:
         response = requests.get('https://api.scryfall.com/cards/')
