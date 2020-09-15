@@ -15,7 +15,9 @@ conda install -c anaconda keras
 conda install -c anaconda pillow
 conda install -c conda-forge opencv
 #
+conda install -c anaconda matplotlib
 conda install --name vsBachelor pylint -y
+
 ```
 
 
