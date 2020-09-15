@@ -10,7 +10,7 @@ In order to use a virtual environment for the development in Visual Studio, I ne
 conda update -n base -c defaults conda
 conda create --name vsBachelor python=3.7 anaconda
 conda activate vsBachelor
-conda install -c anaconda tensorflow
+pip install tensorflow
 conda install -c anaconda keras
 conda install -c anaconda pillow
 conda install -c conda-forge opencv
