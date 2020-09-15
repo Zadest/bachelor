@@ -11,7 +11,7 @@ conda update -n base -c defaults conda
 conda create --name vsBachelor python=3.7 anaconda
 conda activate vsBachelor
 pip install tensorflow
-conda install -c anaconda keras
+pip install keras
 conda install -c anaconda pillow
 conda install -c conda-forge opencv
 #
