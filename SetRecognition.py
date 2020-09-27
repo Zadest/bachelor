@@ -46,7 +46,7 @@ def createModel(shape=(204,146,1)):
 
     model.add(layers.Flatten())
     model.add(layers.Dense(64,activation='relu'))
-    model.add(layers.Dense(8,activation='relu'))
+    model.add(layers.Dense(8))
     model.summary()
     model.compile(optimizer='adam',loss=losses.SparseCategoricalCrossentropy(from_logits=True),metrics=['accuracy'])
     return model
