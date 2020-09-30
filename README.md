@@ -14,7 +14,6 @@ conda install -c conda-forge opencv
 #
 conda install -c anaconda matplotlib
 conda install --name vsBachelor pylint -y
-pip install bs4
 ```
 
 
