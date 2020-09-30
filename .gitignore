@@ -358,8 +358,7 @@ MigrationBackup/
 /.vscode/
 
 __pycache__
-*.jpg
-*.png
+
 /*/*.dat
 /*/*.json
 /data/
