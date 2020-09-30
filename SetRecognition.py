@@ -32,13 +32,12 @@ def progressBar(count,total, status=''):
 
 def createModel(shape=(204,146,1)):
     model = models.Sequential()
+
     model.add(layers.Conv2D(32,(3,3),activation='relu',input_shape=shape))
     model.add(layers.MaxPool2D((2,2)))
-    model.add(layers.Dropout(0.5))
 
     model.add(layers.Conv2D(64,(3,3),activation='relu'))
     model.add(layers.MaxPool2D((2,2)))
-    model.add(layers.Dropout(0.5))
 
     model.add(layers.Conv2D(64,(3,3),activation='relu'))
     model.add(layers.MaxPool2D((2,2)))
@@ -48,7 +47,10 @@ def createModel(shape=(204,146,1)):
     model.add(layers.Dense(64,activation='relu'))
     model.add(layers.Dense(8))
     model.summary()
-    model.compile(optimizer='adam',loss=losses.SparseCategoricalCrossentropy(from_logits=True),metrics=['accuracy'])
+    model.compile(optimizer='adam',
+                loss=losses.SparseCategoricalCrossentropy(from_logits=True),
+                metrics=['accuracy'])
+
     return model
 
 def loadData(filepath=''):
@@ -69,7 +71,7 @@ def loadData(filepath=''):
             _img = Image.open(_filepath+imgPath).convert('L')
             _temp = np.array(_img) * 1./255
             if i == 0 and j == 0:
-                plt.imshow(np.array(_img))
+                plt.imshow(np.array(_img), cmap='gray')
                 plt.show()
             train.append(_temp)
             labels.append(i)
@@ -91,7 +93,7 @@ def loadData(filepath=''):
     train = train.reshape([-1,204,146,1])
     return train, labels, labelClasses
 
-def getData(save=False,filepath=''):
+def getData(save=True,filepath=''):
     train = []
     labels = []
     labelClasses = {0:'grn', 1:'rna', 2:'war', 3:'m20', 4:'eld', 5:'thb', 6:'iko', 7:'m21'}
@@ -120,17 +122,10 @@ def getData(save=False,filepath=''):
                             _img = Image.open(BytesIO(response.content))
                             if save:
                                 _img.save(filepath+f'/{labelClasses[i]}-{j}.jpg')
-                            #_tempList = [np.array(_img) / 255.0]
                             for k in range(0,10):
                                 _tempImg = _img.rotate(random.uniform(-5,5),expand=True).resize((146,204))
                                 if save:
                                     _tempImg.save(filepath+f'/{labelClasses[i]}-{j}-{k}.jpg')
-                                #_tempList = _tempList + [np.array(_tempImg) / 255.0]
-                                #del _tempImg
-                            #labels.append(i)
-                            #train = train + _tempList
-                            #del _tempList
-                            #labels = labels + [i]
                         except Exception as e:
                             print(e)
                             print('fehler 3')
@@ -163,14 +158,12 @@ def trainModel(model, train, labels, epochs=5):
     np.random.seed(2710)
     python_random.seed(2710)
     tf.random.set_seed(2710)
-    plt.imshow(train[0])
-    plt.ylabel(labels[0])
     history = model.fit(x=train,y=labels,epochs=epochs,validation_split=0.1)
     visualizeLoss(history)
     visualizeAcc(history)
     return history
 
-def loadModel(filepath=''):
+def loadModel(filepath='SetDetectionModel'):
     model = models.load_model(filepath)
     return model
 
@@ -189,9 +182,50 @@ if __name__ == '__main__':
     filePath = 'SetDetectionData'
     if '-train' in sys.argv:
         train, labels, labelClasses = loadData(filepath='SetDetectionData')
-        history = trainModel(SetRecognitionModel, train, labels)
+        myModels = [createModel(),createModel(),createModel()]
+        histories = []
+        for mod in myModels:
+            histories.append(trainModel(mod,train,labels))
+        if '-save' in sys.argv:
+            myModels[0].save('SetDetectionModel')
+        myMax = 0
+        for hist in histories:
+            if max(hist.history['loss']) > myMax:
+                myMax = max(hist.history['loss'])
+
+        # loss
+        plt.figure(figsize=(9.0,3.0))
+        for i in range(len(histories)):
+            plt.subplot(1,3,i+1)
+            plt.yticks(np.arange(0, myMax, step=0.2))
+            plt.xticks(np.arange(0, 10, step=1))
+            lossLine = plt.plot([i for i in range(1,len(histories[i].history['loss'])+1)],histories[i].history['loss'],'b')
+            valLossLine = plt.plot([i for i in range(1,len(histories[i].history['val_loss'])+1)],histories[i].history['val_loss'],'g--')
+            plt.setp(lossLine, label='loss') 
+            plt.setp(valLossLine, label='validation loss')
+            plt.ylabel('loss')
+            plt.xlabel('epochs')
+            plt.legend(loc='upper right')
+        plt.show()
+
+        # acc
+        plt.figure(figsize=(9.0,3.0))
+        for i in range(len(histories)):
+            plt.subplot(1,3,i+1)
+            plt.yticks(np.arange(0, 1, step=0.2))
+            plt.xticks(np.arange(0, 10, step=1))
+            lossLine = plt.plot([i for i in range(1,len(histories[i].history['accuracy'])+1)],histories[i].history['accuracy'],'b')
+            valLossLine = plt.plot([i for i in range(1,len(histories[i].history['val_accuracy'])+1)],histories[i].history['val_accuracy'],'g--')
+            plt.setp(lossLine, label='accuracy') 
+            plt.setp(valLossLine, label='validation accuracy')
+            plt.ylabel('accuracy')
+            plt.xlabel('epochs')
+            plt.legend(loc='lower right')
+        plt.show()
+        #history = trainModel(SetRecognitionModel, train, labels)
+
     elif '-load' in sys.argv:
-        SetRecognitionModel = loadModel()
+        SetRecognitionModel = loadModel(filepath='SetDetectionModel')
     elif '-download' in sys.argv:
         if not os.path.exists(filePath):
             os.mkdir(filePath)
