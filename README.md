@@ -1,16 +1,20 @@
-# bachelor
-github repo for my bachelor's project
-
 ### 0. Setting up the development environment
 ##### 0.1 Conda
 
 In order to use a virtual environment for the development in Visual Studio, I needed to create one, with the anaconda environment as base.
 
 ```bash
-conda create --name vsBachelor-dev python=3.7 anaconda
+conda update -n base -c defaults conda
+conda create --name vsBachelor python=3.7 anaconda
+conda activate vsBachelor
+pip install tensorflow
+pip install keras
+conda install -c anaconda pillow
 conda install -c conda-forge opencv
-conda insall --name vsBachelor-dev tensorflow
-conda install --name vsBachelor-dev keras
+#
+conda install -c anaconda matplotlib
+conda install --name vsBachelor pylint -y
+pip install bs4
 ```
 
 

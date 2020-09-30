@@ -352,9 +352,15 @@ MigrationBackup/
 # ignore the vast amount of data
 /data/
 /data/*
-
-# ignore all log files called oberon
-oberon.log*
+*.dat
 
 #ignore vscode folder
 /.vscode/
+
+__pycache__
+*.jpg
+*.png
+/*/*.dat
+/*/*.json
+/data/
+/logs/
